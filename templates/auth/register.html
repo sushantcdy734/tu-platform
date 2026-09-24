@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Register — TU Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="h4 mb-1">Create your account</h2>
+        <p class="text-muted mb-4">Join the TU Platform as a student or teacher.</p>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">First name</label>
+              <input type="text" name="first_name" class="form-control" value="{{ form_data.first_name|default:'' }}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Last name</label>
+              <input type="text" name="last_name" class="form-control" value="{{ form_data.last_name|default:'' }}" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" value="{{ form_data.username|default:'' }}" required minlength="3">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ form_data.email|default:'' }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Phone (optional)</label>
+            <input type="text" name="phone" class="form-control" value="{{ form_data.phone|default:'' }}">
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">I am a…</label>
+              <select name="role" class="form-select" required>
+                <option value="student" {% if form_data.role == 'student' %}selected{% endif %}>Student</option>
+                <option value="teacher" {% if form_data.role == 'teacher' %}selected{% endif %}>Teacher</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">College</label>
+              <select name="college" class="form-select" required>
+                <option value="">— Select college —</option>
+                {% for c in colleges %}
+                  <option value="{{ c.id }}" {% if form_data.college == c.id|stringformat:'s' %}selected{% endif %}>
+                    {{ c.name }} ({{ c.code }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="password1" class="form-control" required minlength="8">
+              <small class="text-muted">At least 8 characters.</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Confirm password</label>
+              <input type="password" name="password2" class="form-control" required minlength="8">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Create account</button>
+        </form>
+
+        <p class="text-center mt-3 mb-0 text-muted">
+          Already have an account? <a href="{% url 'login' %}">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

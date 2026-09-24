@@ -54,14 +54,16 @@
               <span class="badge bg-primary ms-1">{{ user.get_role_display }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="/admin/">Admin Panel</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Logout</a></li>
+              {% if user.is_staff or user.is_tu_admin or user.is_college_admin %}
+                <li><a class="dropdown-item" href="/admin/"><i class="bi bi-gear"></i> Admin Panel</a></li>
+                <li><hr class="dropdown-divider"></li>
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
           </li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Register</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
         {% endif %}
       </ul>
     </div>
@@ -74,16 +76,47 @@
       <!-- Sidebar -->
       <nav class="col-md-2 d-none d-md-block sidebar p-0">
         <div class="pt-3">
+
+          <!-- Main -->
           <div class="nav-section">Main</div>
           <ul class="nav flex-column">
             <li><a class="nav-link" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
           </ul>
-          <div class="nav-section">Management</div>
-          <ul class="nav flex-column">
-            <li><a class="nav-link" href="/admin/colleges/college/"><i class="bi bi-building"></i> Colleges</a></li>
-            <li><a class="nav-link" href="/admin/colleges/district/"><i class="bi bi-geo-alt"></i> Districts</a></li>
-            <li><a class="nav-link" href="/admin/accounts/user/"><i class="bi bi-people"></i> Users</a></li>
-          </ul>
+
+          <!-- TU Admin + College Admin + Django staff -->
+          {% if user.is_tu_admin or user.is_college_admin or user.is_staff %}
+            <div class="nav-section">Management</div>
+            <ul class="nav flex-column">
+              {% if user.is_tu_admin or user.is_staff %}
+                <li><a class="nav-link" href="/admin/colleges/college/"><i class="bi bi-building"></i> Colleges</a></li>
+                <li><a class="nav-link" href="/admin/colleges/district/"><i class="bi bi-geo-alt"></i> Districts</a></li>
+              {% endif %}
+              <li><a class="nav-link" href="/admin/accounts/user/"><i class="bi bi-people"></i> Users</a></li>
+            </ul>
+          {% endif %}
+
+          <!-- Student -->
+          {% if user.is_student %}
+            <div class="nav-section">Student</div>
+            <ul class="nav flex-column">
+              <li><a class="nav-link" href="#"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-journal-text"></i> Assignments</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-award"></i> Results</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
+            </ul>
+          {% endif %}
+
+          <!-- Teacher -->
+          {% if user.is_teacher %}
+            <div class="nav-section">Teacher</div>
+            <ul class="nav flex-column">
+              <li><a class="nav-link" href="#"><i class="bi bi-journal-bookmark"></i> My Subjects</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-people"></i> My Students</a></li>
+              <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
+            </ul>
+          {% endif %}
+
         </div>
       </nav>
       <main class="col-md-10 main-content">
@@ -108,7 +141,12 @@
 
 <footer class="text-center">
   <div class="container">
-    Tribhuvan University Multi-College Platform &middot; Demo Project &middot; {{ user.college.name|default:"TU Admin" }}
+    Tribhuvan University Multi-College Platform &middot; Demo Project &middot;
+    {% if user.is_authenticated %}
+      {{ user.college.name|default:"TU-wide" }}
+    {% else %}
+      Tribhuvan University
+    {% endif %}
   </div>
 </footer>
 
