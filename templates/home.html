@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Home — TU Platform{% endblock %}
+
+{% block content %}
+
+{% if not user.is_authenticated %}
+  <!-- Public Landing -->
+  <div class="text-center py-5">
+    <h1 class="display-4 fw-bold">Tribhuvan University</h1>
+    <p class="lead text-muted">A unified platform connecting colleges, teachers, and students across Nepal.</p>
+    <div class="mt-4">
+      <a href="#" class="btn btn-primary btn-lg me-2">Register</a>
+      <a href="#" class="btn btn-outline-secondary btn-lg">Login</a>
+    </div>
+  </div>
+
+  <div class="row text-center mt-5">
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="bi bi-building display-4 text-primary"></i>
+        <h3 class="mt-3">{{ total_colleges }}</h3>
+        <p class="text-muted">Active Colleges</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="bi bi-geo-alt display-4 text-primary"></i>
+        <h3 class="mt-3">{{ total_districts }}</h3>
+        <p class="text-muted">Districts</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="bi bi-people display-4 text-primary"></i>
+        <h3 class="mt-3">—</h3>
+        <p class="text-muted">Students Enrolled</p>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <!-- Logged-in dashboard -->
+  <h1 class="h3 mb-4">Welcome, {{ user.get_full_name|default:user.username }} 👋</h1>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card p-3">
+        <h6 class="text-muted mb-1">Your Role</h6>
+        <h4 class="mb-0">{{ user.get_role_display }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-3">
+        <h6 class="text-muted mb-1">Your College</h6>
+        <h4 class="mb-0">{{ user.college.name|default:"TU-wide" }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-3">
+        <h6 class="text-muted mb-1">Total Colleges</h6>
+        <h4 class="mb-0">{{ total_colleges }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-3">
+        <h6 class="text-muted mb-1">Districts</h6>
+        <h4 class="mb-0">{{ total_districts }}</h4>
+      </div>
+    </div>
+  </div>
+
+  {% if user.is_tu_admin %}
+    <div class="alert alert-info mt-4">
+      <i class="bi bi-info-circle"></i>
+      You are signed in as a <strong>TU Administrator</strong>. You can manage all colleges via the admin panel.
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}
