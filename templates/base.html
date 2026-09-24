@@ -99,7 +99,7 @@
           {% if user.is_student %}
             <div class="nav-section">Student</div>
             <ul class="nav flex-column">
-              <li><a class="nav-link" href="#"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+              <li><a class="nav-link" href="{% url 'student_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-journal-text"></i> Assignments</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-award"></i> Results</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
@@ -111,7 +111,7 @@
             <div class="nav-section">Teacher</div>
             <ul class="nav flex-column">
               <li><a class="nav-link" href="#"><i class="bi bi-journal-bookmark"></i> My Subjects</a></li>
-              <li><a class="nav-link" href="#"><i class="bi bi-calendar-check"></i> Attendance</a></li>
+              <li><a class="nav-link" href="{% url 'teacher_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-people"></i> My Students</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
             </ul>
