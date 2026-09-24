@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Notices — TU Platform{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-bell"></i> Notices &amp; Announcements</h1>
+
+{% if notices %}
+  <div class="row g-3">
+    {% for n in notices %}
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge
+                {% if n.scope == 'tu' %}bg-danger
+                {% elif n.scope == 'college' %}bg-primary
+                {% else %}bg-info text-dark{% endif %}">
+                {{ n.get_scope_display }}
+                {% if n.scope == 'college' and n.college %} · {{ n.college.code }}{% endif %}
+                {% if n.scope == 'department' and n.department %} · {{ n.department.code }}{% endif %}
+              </span>
+              <small class="text-muted">{{ n.created_at|date:"M d, Y · H:i" }}</small>
+            </div>
+            <h5 class="card-title mb-2">{{ n.title }}</h5>
+            <p class="card-text mb-0" style="white-space: pre-line;">{{ n.body }}</p>
+            {% if n.posted_by %}
+              <hr class="my-3">
+              <small class="text-muted">
+                <i class="bi bi-person-circle"></i>
+                {{ n.posted_by.get_full_name|default:n.posted_by.username }}
+              </small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    No notices available right now.
+  </div>
+{% endif %}
+{% endblock %}

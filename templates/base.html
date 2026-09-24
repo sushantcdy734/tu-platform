@@ -81,6 +81,7 @@
           <div class="nav-section">Main</div>
           <ul class="nav flex-column">
             <li><a class="nav-link" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li><a class="nav-link" href="{% url 'notice_list' %}"><i class="bi bi-bell"></i> Notices</a></li>
           </ul>
 
           <!-- TU Admin + College Admin + Django staff -->
@@ -102,7 +103,6 @@
               <li><a class="nav-link" href="{% url 'student_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-journal-text"></i> Assignments</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-award"></i> Results</a></li>
-              <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
             </ul>
           {% endif %}
 
@@ -113,7 +113,6 @@
               <li><a class="nav-link" href="#"><i class="bi bi-journal-bookmark"></i> My Subjects</a></li>
               <li><a class="nav-link" href="{% url 'teacher_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-people"></i> My Students</a></li>
-              <li><a class="nav-link" href="#"><i class="bi bi-bell"></i> Notices</a></li>
             </ul>
           {% endif %}
 
