@@ -31,6 +31,52 @@
     }
     .main-content { padding: 1.5rem; }
     footer { border-top: 1px solid #e2e8f0; padding: 1rem 0; color: #64748b; font-size: 0.875rem; }
+
+    /* Notification dropdown */
+    .notif-dropdown { width: 380px; max-height: 480px; overflow-y: auto; padding: 0; }
+    .notif-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+    }
+    .notif-item {
+      display: block;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .notif-item:hover { background: #f8fafc; }
+    .notif-item .notif-scope {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #fff;
+    }
+    .notif-item .notif-scope.tu { background: #dc2626; }
+    .notif-item .notif-scope.college { background: #2563eb; }
+    .notif-item .notif-scope.department { background: #0891b2; }
+    .notif-item .notif-title { font-weight: 600; font-size: 0.9rem; margin: 4px 0; }
+    .notif-item .notif-time { font-size: 0.75rem; color: #64748b; }
+    .notif-bell { position: relative; }
+    .notif-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 0.65rem;
+      padding: 2px 5px;
+      background: #dc2626;
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 700;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -45,8 +91,53 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="topNav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-center">
+
         {% if user.is_authenticated %}
+          <!-- Notification Bell -->
+          <li class="nav-item dropdown me-2">
+            <a class="nav-link notif-bell position-relative" href="#"
+               data-bs-toggle="dropdown" aria-expanded="false"
+               title="Notices &amp; Announcements">
+              <i class="bi bi-bell fs-5"></i>
+              {% if recent_notice_count %}
+                <span class="notif-badge">{{ recent_notice_count }}</span>
+              {% endif %}
+            </a>
+            <div class="dropdown-menu dropdown-menu-end notif-dropdown shadow">
+              <div class="notif-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-bell"></i> Notifications</span>
+                <span class="badge bg-secondary">{{ total_notices }} total</span>
+              </div>
+
+              {% if recent_notices %}
+                {% for n in recent_notices %}
+                  <a class="notif-item" href="{% url 'notice_list' %}">
+                    <span class="notif-scope {{ n.scope }}">
+                      {{ n.get_scope_display }}
+                      {% if n.scope == 'college' and n.college %} · {{ n.college.code }}{% endif %}
+                      {% if n.scope == 'department' and n.department %} · {{ n.department.code }}{% endif %}
+                    </span>
+                    <div class="notif-title">{{ n.title|truncatechars:60 }}</div>
+                    <div class="notif-time">
+                      <i class="bi bi-clock"></i> {{ n.created_at|timesince }} ago
+                    </div>
+                  </a>
+                {% endfor %}
+                <a class="notif-item text-center text-primary fw-semibold"
+                   href="{% url 'notice_list' %}">
+                  View all notices <i class="bi bi-arrow-right"></i>
+                </a>
+              {% else %}
+                <div class="notif-item text-center text-muted py-4">
+                  <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                  No notices yet
+                </div>
+              {% endif %}
+            </div>
+          </li>
+
+          <!-- User Dropdown -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
               <i class="bi bi-person-circle"></i>
@@ -77,14 +168,17 @@
       <nav class="col-md-2 d-none d-md-block sidebar p-0">
         <div class="pt-3">
 
-          <!-- Main -->
           <div class="nav-section">Main</div>
           <ul class="nav flex-column">
             <li><a class="nav-link" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a class="nav-link" href="{% url 'notice_list' %}"><i class="bi bi-bell"></i> Notices</a></li>
+            <li><a class="nav-link" href="{% url 'notice_list' %}">
+              <i class="bi bi-bell"></i> Notices
+              {% if recent_notice_count %}
+                <span class="badge bg-danger ms-1">{{ recent_notice_count }}</span>
+              {% endif %}
+            </a></li>
           </ul>
 
-          <!-- TU Admin + College Admin + Django staff -->
           {% if user.is_tu_admin or user.is_college_admin or user.is_staff %}
             <div class="nav-section">Management</div>
             <ul class="nav flex-column">
@@ -96,7 +190,6 @@
             </ul>
           {% endif %}
 
-          <!-- Student -->
           {% if user.is_student %}
             <div class="nav-section">Student</div>
             <ul class="nav flex-column">
@@ -106,7 +199,6 @@
             </ul>
           {% endif %}
 
-          <!-- Teacher -->
           {% if user.is_teacher %}
             <div class="nav-section">Teacher</div>
             <ul class="nav flex-column">
