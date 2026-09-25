@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'dashboard',
     'assignments',
     'complaints',
-    'documents',    # <-- ADDED
+    'documents', 
+    'events',      # <-- ADDED
 ]
 
 MIDDLEWARE = [

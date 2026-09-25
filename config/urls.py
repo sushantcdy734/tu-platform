@@ -12,7 +12,8 @@ urlpatterns = [
     path('academics/', include('academics.urls')),
     path('assignments/', include('assignments.urls')),
     path('complaints/', include('complaints.urls')),
-    path('documents/', include('documents.urls')),    # <-- NEW
+    path('documents/', include('documents.urls')),
+    path('events/', include('events.urls')),    # <-- NEW
     path('', home, name='home'),
 ]
 
