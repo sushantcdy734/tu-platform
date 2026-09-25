@@ -13,7 +13,7 @@ SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'django-insecure-dev-only-key-change-in-production'
 )
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = True
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
     'localhost,127.0.0.1,.onrender.com'
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'attendance',
     'notices',
     'dashboard',
+    'assignments',    # <-- ADD THIS
 ]
 
 MIDDLEWARE = [

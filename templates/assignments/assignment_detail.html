@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ assignment.title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-0">{{ assignment.title }}</h1>
+    <p class="text-muted mb-0">{{ assignment.subject.code }} — {{ assignment.subject.name }}</p>
+  </div>
+  <a href="{% url 'teacher_assignments' %}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+{% if assignment.description %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6 class="text-muted mb-2">Description</h6>
+      <p class="mb-0" style="white-space: pre-line;">{{ assignment.description }}</p>
+    </div>
+  </div>
+{% endif %}
+
+<h5 class="mt-4 mb-3">Submissions ({{ submissions.count }})</h5>
+
+{% if submissions %}
+  {% for s in submissions %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <div>
+            <strong>{{ s.student.get_full_name|default:s.student.username }}</strong>
+            <span class="badge
+              {% if s.status == 'graded' %}bg-success
+              {% elif s.status == 'late' %}bg-warning text-dark
+              {% else %}bg-primary{% endif %} ms-2">
+              {{ s.get_status_display }}
+            </span>
+          </div>
+          <small class="text-muted">Submitted {{ s.submitted_at|date:"M d, Y H:i" }}</small>
+        </div>
+
+        {% if s.text_answer %}
+          <p class="mb-2" style="white-space: pre-line;">{{ s.text_answer }}</p>
+        {% endif %}
+
+        {% if s.file %}
+          <p class="mb-2">
+            <a href="{{ s.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-download"></i> Download file
+            </a>
+          </p>
+        {% endif %}
+
+        <hr>
+        <form method="post" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <input type="hidden" name="submission_id" value="{{ s.id }}">
+          <div class="col-md-2">
+            <label class="form-label small mb-0">Marks (out of {{ assignment.total_marks }})</label>
+            <input type="number" step="0.01" min="0" max="{{ assignment.total_marks }}"
+                   name="marks_obtained" class="form-control form-control-sm"
+                   value="{{ s.marks_obtained|default_if_none:'' }}">
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small mb-0">Feedback</label>
+            <input type="text" name="feedback" class="form-control form-control-sm"
+                   value="{{ s.feedback }}" placeholder="Optional feedback">
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-sm btn-primary w-100">
+              <i class="bi bi-save"></i> Save Grade
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">No submissions yet.</div>
+{% endif %}
+{% endblock %}

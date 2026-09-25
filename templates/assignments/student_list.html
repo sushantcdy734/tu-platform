@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Assignments{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-journal-text"></i> My Assignments</h1>
+
+{% if assignments %}
+  <div class="row g-3">
+    {% for a in assignments %}
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-primary">{{ a.subject.code }}</span>
+              {% if a.deadline %}
+                {% if a.is_past_deadline %}
+                  <span class="badge bg-danger">Closed</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">
+                    Due {{ a.deadline|date:"M d, H:i" }}
+                  </span>
+                {% endif %}
+              {% endif %}
+            </div>
+            <h5 class="card-title">{{ a.title }}</h5>
+            <p class="card-text text-muted small">{{ a.description|truncatechars:150 }}</p>
+
+            {% if a.id in submitted_ids %}
+              <div class="alert alert-success py-2 mb-2">
+                <i class="bi bi-check-circle"></i> <strong>Submitted</strong>
+              </div>
+            {% else %}
+              <a href="{% url 'submit_assignment' a.id %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-upload"></i> Submit
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No assignments yet.
+  </div>
+{% endif %}
+{% endblock %}

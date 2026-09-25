@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Exams — TU Platform{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-journal-check"></i> My Exams</h1>
+
+{% if exams %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Exam</th>
+            <th>Subject</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th class="text-center">Students</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in exams %}
+            <tr>
+              <td><strong>{{ e.name }}</strong></td>
+              <td>{{ e.subject.code }} — {{ e.subject.name }}</td>
+              <td><span class="badge bg-secondary">{{ e.get_exam_type_display }}</span></td>
+              <td>{{ e.date|default:"—" }}</td>
+              <td class="text-center">{{ e.student_count }}</td>
+              <td>
+                <a href="{% url 'exam_marks' e.id %}" class="btn btn-sm btn-primary">
+                  Enter Marks
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    You don't have any exams yet. Create them from the
+    <a href="/admin/academics/exam/">admin panel</a>.
+  </div>
+{% endif %}
+{% endblock %}

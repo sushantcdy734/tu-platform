@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Submit Assignment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="mb-1">{{ assignment.title }}</h3>
+        <p class="text-muted mb-4">{{ assignment.subject.code }} — {{ assignment.subject.name }}</p>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Your Answer</label>
+            <textarea name="text_answer" rows="6" class="form-control"
+                      placeholder="Type your answer here..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Attach File (optional)</label>
+            <input type="file" name="file" class="form-control">
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-upload"></i> Submit Assignment
+            </button>
+            <a href="{% url 'student_assignments' %}" class="btn btn-outline-secondary">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

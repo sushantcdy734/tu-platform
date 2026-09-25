@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}My Results — TU Platform{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-award"></i> My Results</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="text-muted mb-1">Total Exams</h6>
+      <h3 class="mb-0">{{ total_exams }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="text-muted mb-1">Passed</h6>
+      <h3 class="mb-0 text-success">{{ passed }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="text-muted mb-1">Failed</h6>
+      <h3 class="mb-0 text-danger">{{ failed }}</h3>
+    </div>
+  </div>
+</div>
+
+{% if subjects %}
+  {% for subject, marks_list in subjects.items %}
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <strong>{{ subject.code }}</strong> — {{ subject.name }}
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Exam</th>
+              <th>Date</th>
+              <th class="text-center">Marks</th>
+              <th class="text-center">%</th>
+              <th class="text-center">Grade</th>
+              <th class="text-center">Result</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in marks_list %}
+              <tr>
+                <td>{{ m.exam.name }}</td>
+                <td>{{ m.exam.date|default:"—" }}</td>
+                <td class="text-center">
+                  {% if m.is_absent %}
+                    —
+                  {% else %}
+                    {{ m.marks_obtained|default:"—" }} / {{ m.exam.total_marks }}
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if m.percentage %}{{ m.percentage }}%{% else %}—{% endif %}
+                </td>
+                <td class="text-center">
+                  <span class="badge
+                    {% if m.grade == 'A+' or m.grade == 'A' %}bg-success
+                    {% elif m.grade == 'B+' or m.grade == 'B' %}bg-primary
+                    {% elif m.grade == 'C+' or m.grade == 'C' %}bg-warning text-dark
+                    {% elif m.grade == 'F' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ m.grade }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  {% if m.is_absent %}
+                    <span class="text-muted">Absent</span>
+                  {% elif m.passed %}
+                    <span class="text-success"><i class="bi bi-check-circle"></i> Pass</span>
+                  {% elif m.passed is False %}
+                    <span class="text-danger"><i class="bi bi-x-circle"></i> Fail</span>
+                  {% else %}
+                    <span class="text-muted">Pending</span>
+                  {% endif %}
+                </td>
+                <td>{{ m.remarks|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    No results published yet. Check back later.
+  </div>
+{% endif %}
+{% endblock %}
