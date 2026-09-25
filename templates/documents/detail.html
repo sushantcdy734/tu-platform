@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Request #{{ req.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <h1 class="h3 mb-0">
+      <i class="bi bi-file-earmark-text"></i> {{ req.get_document_type_display }}
+    </h1>
+    <p class="text-muted mb-0">Request #{{ req.id }} · {{ req.copies }} cop{{ req.copies|pluralize:"y,ies" }}</p>
+  </div>
+  <a href="{% url 'document_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">Purpose</h6>
+        <p class="mb-3" style="white-space: pre-line;">{{ req.purpose }}</p>
+        <hr>
+        <small class="text-muted">
+          Requested by
+          <strong>{{ req.student.get_full_name|default:req.student.username }}</strong>
+          · {{ req.created_at|date:"M d, Y H:i" }}
+        </small>
+      </div>
+    </div>
+
+    {% if req.admin_note %}
+      <div class="card mb-3 border-info">
+        <div class="card-body">
+          <h6 class="text-muted mb-2">Staff Note</h6>
+          <p class="mb-0">{{ req.admin_note }}</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-3">Status</h6>
+        <p>
+          <span class="badge bg-{{ req.status_color }} fs-6">{{ req.get_status_display }}</span>
+        </p>
+
+        {% if req.ready_at %}
+          <p class="mb-1 mt-3"><small class="text-muted">Ready since</small><br>{{ req.ready_at|date:"M d, Y" }}</p>
+        {% endif %}
+        {% if req.delivered_at %}
+          <p class="mb-1 mt-3"><small class="text-muted">Delivered</small><br>{{ req.delivered_at|date:"M d, Y" }}</p>
+        {% endif %}
+        {% if req.handled_by %}
+          <p class="mb-0 mt-3"><small class="text-muted">Handled by</small><br>{{ req.handled_by.get_full_name|default:req.handled_by.username }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if not user.is_student %}
+      <div class="card">
+        <div class="card-body">
+          <h6 class="text-muted mb-3">Update Request</h6>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label small">Status</label>
+              <select name="status" class="form-select form-select-sm">
+                {% for key, label in status_choices %}
+                  <option value="{{ key }}" {% if req.status == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Admin note</label>
+              <textarea name="admin_note" rows="3" class="form-control form-control-sm"
+                        placeholder="Optional note for the student...">{{ req.admin_note }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+              <i class="bi bi-save"></i> Save Update
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
