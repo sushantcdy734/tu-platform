@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Complaints — TU Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-ticket-detailed"></i>
+    {% if user.is_student %}My Complaints{% else %}Complaints{% endif %}
+  </h1>
+  {% if user.is_student or user.is_teacher %}
+    <a href="{% url 'complaint_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> New Complaint
+    </a>
+  {% endif %}
+</div>
+
+<!-- Filters -->
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <select name="status" class="form-select form-select-sm">
+      <option value="">All statuses</option>
+      {% for key, label in status_choices %}
+        <option value="{{ key }}" {% if current_status == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="category" class="form-select form-select-sm">
+      <option value="">All categories</option>
+      {% for key, label in category_choices %}
+        <option value="{{ key }}" {% if current_category == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Filter</button>
+  </div>
+</form>
+
+{% if complaints %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th><th>Subject</th><th>Category</th>
+            <th>Status</th><th>Priority</th><th>Submitted</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+            <tr>
+              <td>#{{ c.id }}</td>
+              <td>
+                <strong>{{ c.subject }}</strong><br>
+                <small class="text-muted">
+                  by {{ c.submitted_by.get_full_name|default:c.submitted_by.username }}
+                </small>
+              </td>
+              <td><span class="badge bg-light text-dark">{{ c.get_category_display }}</span></td>
+              <td><span class="badge bg-{{ c.status_color }}">{{ c.get_status_display }}</span></td>
+              <td><span class="badge bg-{{ c.priority_color }}">{{ c.get_priority_display }}</span></td>
+              <td><small>{{ c.created_at|date:"M d, Y" }}</small></td>
+              <td>
+                <a href="{% url 'complaint_detail' c.id %}" class="btn btn-sm btn-outline-primary">Open</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No complaints found.
+    {% if user.is_student %}
+      <a href="{% url 'complaint_create' %}">Submit one →</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

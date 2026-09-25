@@ -187,6 +187,7 @@
                 <li><a class="nav-link" href="/admin/colleges/district/"><i class="bi bi-geo-alt"></i> Districts</a></li>
               {% endif %}
               <li><a class="nav-link" href="/admin/accounts/user/"><i class="bi bi-people"></i> Users</a></li>
+              <li><a class="nav-link" href="{% url 'complaint_list' %}"><i class="bi bi-ticket-detailed"></i> Complaints</a></li>
             </ul>
           {% endif %}
 
@@ -196,6 +197,7 @@
               <li><a class="nav-link" href="{% url 'student_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="{% url 'student_assignments' %}"><i class="bi bi-journal-text"></i> Assignments</a></li>
               <li><a class="nav-link" href="{% url 'student_results' %}"><i class="bi bi-award"></i> Results</a></li>
+              <li><a class="nav-link" href="{% url 'complaint_list' %}"><i class="bi bi-ticket-detailed"></i> Complaints</a></li>
             </ul>
           {% endif %}
 
@@ -206,6 +208,7 @@
               <li><a class="nav-link" href="{% url 'teacher_assignments' %}"><i class="bi bi-journal-text"></i> Assignments</a></li>
               <li><a class="nav-link" href="{% url 'teacher_attendance' %}"><i class="bi bi-calendar-check"></i> Attendance</a></li>
               <li><a class="nav-link" href="#"><i class="bi bi-people"></i> My Students</a></li>
+              <li><a class="nav-link" href="{% url 'complaint_list' %}"><i class="bi bi-ticket-detailed"></i> Complaints</a></li>
             </ul>
           {% endif %}
 
