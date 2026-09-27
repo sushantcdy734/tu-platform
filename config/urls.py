@@ -13,7 +13,8 @@ urlpatterns = [
     path('assignments/', include('assignments.urls')),
     path('complaints/', include('complaints.urls')),
     path('documents/', include('documents.urls')),
-    path('events/', include('events.urls')),    # <-- NEW
+    path('events/', include('events.urls')),
+    path('clubs/', include('clubs.urls')),
     path('', home, name='home'),
 ]
 

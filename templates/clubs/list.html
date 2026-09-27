@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Clubs — TU Platform{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-people-fill"></i> Student Clubs</h1>
+
+{% if clubs %}
+  <div class="row g-3">
+    {% for c in clubs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-{{ c.category_color }}">{{ c.get_category_display }}</span>
+              {% if c.id in approved_ids %}
+                <span class="badge bg-success"><i class="bi bi-check"></i> Member</span>
+              {% elif c.id in pending_ids %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </div>
+            <h5 class="card-title">{{ c.name }}</h5>
+            <p class="card-text text-muted small mb-3">{{ c.description|truncatechars:120 }}</p>
+            <ul class="list-unstyled small text-muted mb-3">
+              <li><i class="bi bi-people"></i> {{ c.member_count }} member{{ c.member_count|pluralize }}</li>
+              {% if c.coordinator %}
+                <li><i class="bi bi-person-badge"></i> {{ c.coordinator.get_full_name|default:c.coordinator.username }}</li>
+              {% endif %}
+            </ul>
+            <a href="{% url 'club_detail' c.id %}" class="btn btn-sm btn-primary w-100">View club</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No clubs available yet.
+  </div>
+{% endif %}
+{% endblock %}

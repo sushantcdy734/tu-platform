@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}{{ club.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <span class="badge bg-{{ club.category_color }} mb-2">{{ club.get_category_display }}</span>
+    <h1 class="h3 mb-0">{{ club.name }}</h1>
+    <p class="text-muted mb-0">{{ club.college.name }}</p>
+  </div>
+  <a href="{% url 'club_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-8">
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">About this club</h6>
+        <p class="mb-0" style="white-space: pre-line;">
+          {{ club.description|default:"No description provided yet." }}
+        </p>
+        {% if club.coordinator %}
+          <hr>
+          <small class="text-muted">
+            <i class="bi bi-person-badge"></i>
+            Coordinator: <strong>{{ club.coordinator.get_full_name|default:club.coordinator.username }}</strong>
+          </small>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if is_club_admin and pending %}
+      <div class="card mb-3 border-warning">
+        <div class="card-header bg-warning bg-opacity-10">
+          <strong>Pending Requests ({{ pending.count }})</strong>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0 align-middle">
+            <tbody>
+              {% for m in pending %}
+                <tr>
+                  <td>
+                    <strong>{{ m.user.get_full_name|default:m.user.username }}</strong>
+                    <br><small class="text-muted">{{ m.user.username }}</small>
+                  </td>
+                  <td><small class="text-muted">{{ m.reason|default:"—" }}</small></td>
+                  <td class="text-end">
+                    <form method="post" action="{% url 'membership_review' club.id m.id %}" class="d-inline">
+                      {% csrf_token %}
+                      <button name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+                      <button name="action" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card mb-3">
+      <div class="card-header bg-light"><strong>Members ({{ members.count }})</strong></div>
+      <div class="card-body p-0">
+        {% if members %}
+          <ul class="list-group list-group-flush">
+            {% for m in members %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ m.user.get_full_name|default:m.user.username }}</strong>
+                  <br><small class="text-muted">{{ m.user.username }}</small>
+                </div>
+                <span class="badge bg-secondary">{{ m.get_role_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="p-3 text-muted small">No approved members yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>Announcements ({{ announcements.count }})</strong>
+        {% if is_club_admin %}
+          <a href="{% url 'club_announce' club.id %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> New
+          </a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if announcements %}
+          {% for a in announcements %}
+            <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+              <h6 class="mb-1">{{ a.title }}</h6>
+              <p class="mb-1 small" style="white-space: pre-line;">{{ a.body }}</p>
+              <small class="text-muted">
+                {{ a.posted_by.get_full_name|default:a.posted_by.username|default:"System" }}
+                · {{ a.created_at|date:"M d, Y H:i" }}
+              </small>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted mb-0 small">No announcements yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-3">Your Membership</h6>
+
+        {% if my_membership %}
+          <p class="mb-2">
+            <span class="badge bg-{{ my_membership.status_color }} fs-6">
+              {{ my_membership.get_status_display }}
+            </span>
+          </p>
+          <p class="mb-1 small"><strong>Role:</strong> {{ my_membership.get_role_display }}</p>
+          <p class="mb-3 small text-muted">Requested on {{ my_membership.requested_at|date:"M d, Y" }}</p>
+
+          {% if my_membership.status == 'approved' %}
+            <form method="post" action="{% url 'club_leave' club.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger w-100">Leave club</button>
+            </form>
+          {% endif %}
+        {% else %}
+          {% if user.is_student or user.is_teacher %}
+            <a href="{% url 'club_join' club.id %}" class="btn btn-primary w-100">
+              <i class="bi bi-person-plus"></i> Request to Join
+            </a>
+          {% else %}
+            <p class="text-muted small mb-0">Only students and teachers can join clubs.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h6 class="text-muted mb-3">Club Stats</h6>
+        <p class="mb-1"><strong>{{ club.member_count }}</strong> approved member{{ club.member_count|pluralize }}</p>
+        <p class="mb-1"><strong>{{ announcements.count }}</strong> announcement{{ announcements.count|pluralize }}</p>
+        {% if is_club_admin %}
+          <p class="mb-0 text-warning"><strong>{{ club.pending_count }}</strong> pending request{{ club.pending_count|pluralize }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
