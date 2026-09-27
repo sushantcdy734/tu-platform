@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ lab.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <span class="badge bg-{{ lab.type_color }} mb-2">{{ lab.get_lab_type_display }}</span>
+    <h1 class="h3 mb-0">{{ lab.name }}</h1>
+    <p class="text-muted mb-0">{{ lab.college.name }}{% if lab.location %} · {{ lab.location }}{% endif %}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'lab_book' lab.id %}" class="btn btn-primary">
+      <i class="bi bi-calendar-plus"></i> Book Lab
+    </a>
+    <a href="{% url 'lab_list' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-8">
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">About</h6>
+        <p class="mb-0" style="white-space: pre-line;">{{ lab.description|default:"No description." }}</p>
+        {% if lab.in_charge %}
+          <hr>
+          <small class="text-muted">
+            <i class="bi bi-person-badge"></i>
+            In-charge: <strong>{{ lab.in_charge.get_full_name|default:lab.in_charge.username }}</strong>
+          </small>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if is_lab_staff and pending %}
+      <div class="card mb-3 border-warning">
+        <div class="card-header bg-warning bg-opacity-10">
+          <strong>Pending Bookings ({{ pending.count }})</strong>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <tbody>
+                {% for b in pending %}
+                  <tr>
+                    <td>
+                      <strong>{{ b.booked_by.get_full_name|default:b.booked_by.username }}</strong>
+                      <br><small class="text-muted">{{ b.date }} · {{ b.start_time }}–{{ b.end_time }} · {{ b.expected_people }} people</small>
+                      <br><small>{{ b.purpose|truncatechars:80 }}</small>
+                    </td>
+                    <td class="text-end">
+                      <form method="post" action="{% url 'booking_review' lab.id b.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+                        <button name="action" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header bg-light"><strong>Equipment ({{ equipment.count }})</strong></div>
+      <div class="card-body p-0">
+        {% if equipment %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr><th>Name</th><th>Code</th><th>Qty</th><th>Condition</th><th></th></tr>
+              </thead>
+              <tbody>
+                {% for e in equipment %}
+                  <tr>
+                    <td><strong>{{ e.name }}</strong></td>
+                    <td><small class="text-muted">{{ e.code|default:"—" }}</small></td>
+                    <td>{{ e.quantity }}</td>
+                    <td><span class="badge bg-{{ e.condition_color }}">{{ e.get_condition_display }}</span></td>
+                    <td>
+                      {% if e.condition != 'working' %}
+                        <a href="{% url 'report_maintenance' e.id %}" class="btn btn-sm btn-outline-warning">
+                          <i class="bi bi-wrench"></i> Report
+                        </a>
+                      {% else %}
+                        <a href="{% url 'report_maintenance' e.id %}" class="btn btn-sm btn-outline-secondary">
+                          <i class="bi bi-wrench"></i> Issue?
+                        </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="p-3 text-muted small">No equipment added yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-3">Lab Stats</h6>
+        <p class="mb-2"><strong>Capacity:</strong> {{ lab.capacity }} people</p>
+        <p class="mb-2"><strong>Equipment:</strong> {{ lab.equipment_count }} items</p>
+        <p class="mb-2"><strong>Working:</strong> {{ lab.working_count }}</p>
+        <p class="mb-0"><strong>Bookings:</strong> {{ lab.bookings.count }}</p>
+      </div>
+    </div>
+
+    {% if my_bookings %}
+      <div class="card">
+        <div class="card-header bg-light"><strong>My Bookings</strong></div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            {% for b in my_bookings|slice:":5" %}
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                  <strong>{{ b.date }}</strong>
+                  <span class="badge bg-{{ b.status_color }}">{{ b.get_status_display }}</span>
+                </div>
+                <small class="text-muted">{{ b.start_time }}–{{ b.end_time }}</small>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

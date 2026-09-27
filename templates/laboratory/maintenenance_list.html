@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Maintenance Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-wrench"></i> Maintenance Requests</h1>
+  <a href="{% url 'lab_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back to Labs
+  </a>
+</div>
+
+{% if requests %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Equipment</th><th>Lab</th><th>Issue</th>
+            <th>Priority</th><th>Status</th><th>Reported</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+            <tr>
+              <td><strong>{{ r.equipment.name }}</strong></td>
+              <td><small>{{ r.equipment.lab.name }}</small></td>
+              <td><small>{{ r.issue|truncatechars:80 }}</small></td>
+              <td><span class="badge bg-{{ r.priority_color }}">{{ r.get_priority_display }}</span></td>
+              <td><span class="badge bg-{{ r.status_color }}">{{ r.get_status_display }}</span></td>
+              <td>
+                <small>{{ r.created_at|date:"M d, Y" }}</small>
+                <br><small class="text-muted">{{ r.reported_by.username }}</small>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-success">
+    <i class="bi bi-check-circle"></i> No maintenance requests. Everything is working.
+  </div>
+{% endif %}
+{% endblock %}

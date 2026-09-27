@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Laboratories — TU Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-tools"></i> Laboratories</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'my_lab_bookings' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-calendar-check"></i> My Bookings
+    </a>
+    {% if user.is_tu_admin or user.is_college_admin or user.is_staff %}
+      <a href="{% url 'maintenance_list' %}" class="btn btn-outline-warning">
+        <i class="bi bi-wrench"></i> Maintenance
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% if labs %}
+  <div class="row g-3">
+    {% for lab in labs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-{{ lab.type_color }}">{{ lab.get_lab_type_display }}</span>
+              <span class="badge bg-light text-dark">{{ lab.capacity }} seats</span>
+            </div>
+            <h5 class="card-title">{{ lab.name }}</h5>
+            {% if lab.location %}
+              <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ lab.location }}</p>
+            {% endif %}
+            <p class="card-text text-muted small mb-3">{{ lab.description|truncatechars:100 }}</p>
+            <ul class="list-unstyled small text-muted mb-3">
+              <li><i class="bi bi-cpu"></i> {{ lab.equipment_count }} equipment · {{ lab.working_count }} working</li>
+              {% if lab.in_charge %}
+                <li><i class="bi bi-person-badge"></i> {{ lab.in_charge.get_full_name|default:lab.in_charge.username }}</li>
+              {% endif %}
+            </ul>
+            <a href="{% url 'lab_detail' lab.id %}" class="btn btn-sm btn-primary w-100">View lab</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No labs available yet.
+  </div>
+{% endif %}
+{% endblock %}

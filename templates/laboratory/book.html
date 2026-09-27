@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Book {{ lab.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="mb-1"><i class="bi bi-calendar-plus"></i> Book {{ lab.name }}</h3>
+        <p class="text-muted mb-4">{{ lab.get_lab_type_display }} · Capacity {{ lab.capacity }}</p>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Purpose</label>
+            <textarea name="purpose" rows="3" class="form-control" required
+                      placeholder="What will you use the lab for?"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Date</label>
+              <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Start time</label>
+              <input type="time" name="start_time" class="form-control" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">End time</label>
+              <input type="time" name="end_time" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Expected number of people</label>
+            <input type="number" name="expected_people" min="1"
+                   value="1" class="form-control" required>
+          </div>
+
+          <div class="alert alert-info small">
+            <i class="bi bi-info-circle"></i>
+            Your booking will be reviewed by the lab in-charge before it is confirmed.
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send"></i> Submit Booking
+            </button>
+            <a href="{% url 'lab_detail' lab.id %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

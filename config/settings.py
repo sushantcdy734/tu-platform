@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'documents', 
     'events', 
     'clubs', 
-    'library',    # <-- ADDED
+    'library',
+    'laboratory',# <-- ADDED
+        
 ]
 
 MIDDLEWARE = [

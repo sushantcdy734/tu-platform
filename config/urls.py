@@ -16,6 +16,7 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('clubs/', include('clubs.urls')),
     path('library/', include('library.urls')),
+    path('laboratory/', include('laboratory.urls')),
     path('', home, name='home'),
 ]
 
