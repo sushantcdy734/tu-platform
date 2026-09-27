@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Library — TU Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-book"></i> Library Catalog</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'my_books' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-bookmark-check"></i> My Books
+    </a>
+    {% if user.is_tu_admin or user.is_college_admin or user.is_staff %}
+      <a href="{% url 'overdue_list' %}" class="btn btn-outline-danger">
+        <i class="bi bi-exclamation-triangle"></i> Overdue
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-6">
+    <input type="text" name="q" value="{{ q }}" class="form-control"
+           placeholder="Search by title, author, ISBN, or publisher...">
+  </div>
+  <div class="col-md-3">
+    <select name="category" class="form-select">
+      <option value="">All categories</option>
+      {% for key, label in category_choices %}
+        <option value="{{ key }}" {% if category == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="bi bi-search"></i> Search
+    </button>
+  </div>
+</form>
+
+{% if books %}
+  <div class="row g-3">
+    {% for b in books %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-secondary">{{ b.get_category_display }}</span>
+              {% if b.is_available %}
+                <span class="badge bg-success">{{ b.available_copies }} available</span>
+              {% else %}
+                <span class="badge bg-danger">Unavailable</span>
+              {% endif %}
+            </div>
+            <h5 class="card-title">{{ b.title }}</h5>
+            <p class="card-text text-muted small mb-2">
+              <i class="bi bi-person"></i> {{ b.author }}
+            </p>
+            {% if b.isbn %}
+              <p class="card-text text-muted small mb-2">
+                <i class="bi bi-upc"></i> {{ b.isbn }}
+              </p>
+            {% endif %}
+            <p class="card-text small mb-3">
+              Total copies: <strong>{{ b.total_copies }}</strong>
+            </p>
+            <a href="{% url 'book_detail' b.id %}" class="btn btn-sm btn-primary w-100">
+              View details
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No books found.
+  </div>
+{% endif %}
+{% endblock %}

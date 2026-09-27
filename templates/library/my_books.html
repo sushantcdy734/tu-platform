@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}My Books{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-bookmark-check"></i> My Books</h1>
+  <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back to Library
+  </a>
+</div>
+
+<h5 class="mb-3">Currently Borrowed ({{ active.count }})</h5>
+{% if active %}
+  <div class="card mb-4">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr><th>Book</th><th>Issued</th><th>Due</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for i in active %}
+            <tr>
+              <td><strong>{{ i.book.title }}</strong><br><small class="text-muted">{{ i.book.author }}</small></td>
+              <td><small>{{ i.issued_at|date:"M d, Y" }}</small></td>
+              <td>
+                <small>{{ i.due_date|date:"M d, Y" }}</small>
+                {% if i.is_overdue %}
+                  <br><span class="badge bg-danger">{{ i.days_overdue }} days late</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-{{ i.status_color }}">{{ i.get_status_display }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle"></i> You have no books currently borrowed.
+  </div>
+{% endif %}
+
+<h5 class="mb-3">Return History ({{ history.count }})</h5>
+{% if history %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr><th>Book</th><th>Issued</th><th>Returned</th><th>Fine</th></tr>
+        </thead>
+        <tbody>
+          {% for i in history %}
+            <tr>
+              <td><strong>{{ i.book.title }}</strong></td>
+              <td><small>{{ i.issued_at|date:"M d, Y" }}</small></td>
+              <td><small>{{ i.returned_at|date:"M d, Y"|default:"—" }}</small></td>
+              <td>
+                {% if i.fine_amount > 0 %}
+                  <small class="text-danger">Rs. {{ i.fine_amount }}</small>
+                  {% if i.fine_paid %}
+                    <span class="badge bg-success ms-1">Paid</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark ms-1">Unpaid</span>
+                  {% endif %}
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-light border">No history yet.</div>
+{% endif %}
+{% endblock %}

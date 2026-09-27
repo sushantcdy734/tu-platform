@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <span class="badge bg-secondary mb-2">{{ book.get_category_display }}</span>
+    <h1 class="h3 mb-0">{{ book.title }}</h1>
+    <p class="text-muted mb-0">by {{ book.author }}</p>
+  </div>
+  <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-2">Description</h6>
+        <p class="mb-0" style="white-space: pre-line;">
+          {{ book.description|default:"No description provided." }}
+        </p>
+      </div>
+    </div>
+
+    {% if is_staff_view and issues %}
+      <div class="card mb-3">
+        <div class="card-header bg-light"><strong>Issue History</strong></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Borrower</th><th>Issued</th><th>Due</th><th>Status</th><th>Fine</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in issues %}
+                  <tr>
+                    <td>
+                      <strong>{{ i.borrower.get_full_name|default:i.borrower.username }}</strong>
+                      <br><small class="text-muted">{{ i.borrower.username }}</small>
+                    </td>
+                    <td><small>{{ i.issued_at|date:"M d, Y" }}</small></td>
+                    <td>
+                      <small>{{ i.due_date|date:"M d, Y" }}</small>
+                      {% if i.is_overdue %}
+                        <span class="badge bg-danger ms-1">{{ i.days_overdue }}d late</span>
+                      {% endif %}
+                    </td>
+                    <td><span class="badge bg-{{ i.status_color }}">{{ i.get_status_display }}</span></td>
+                    <td>
+                      {% if i.fine_amount > 0 %}
+                        <small class="text-danger">Rs. {{ i.fine_amount }}</small>
+                      {% else %}—{% endif %}
+                    </td>
+                    <td>
+                      {% if i.status == 'issued' %}
+                        <form method="post" action="{% url 'return_book' book.id i.id %}" class="d-inline">
+                          {% csrf_token %}
+                          <button class="btn btn-sm btn-outline-success">Return</button>
+                        </form>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="text-muted mb-3">Book Details</h6>
+        <p class="mb-2"><strong>Total copies:</strong> {{ book.total_copies }}</p>
+        <p class="mb-2"><strong>Issued:</strong> {{ book.issued_count }}</p>
+        <p class="mb-2"><strong>Available:</strong>
+          <span class="badge bg-{% if book.is_available %}success{% else %}danger{% endif %}">
+            {{ book.available_copies }}
+          </span>
+        </p>
+        {% if book.publisher %}
+          <p class="mb-2"><strong>Publisher:</strong> {{ book.publisher }}</p>
+        {% endif %}
+        {% if book.edition %}
+          <p class="mb-2"><strong>Edition:</strong> {{ book.edition }}</p>
+        {% endif %}
+        {% if book.year %}
+          <p class="mb-2"><strong>Year:</strong> {{ book.year }}</p>
+        {% endif %}
+        {% if book.isbn %}
+          <p class="mb-2"><strong>ISBN:</strong> {{ book.isbn }}</p>
+        {% endif %}
+        {% if book.shelf_location %}
+          <p class="mb-0"><strong>Shelf:</strong> {{ book.shelf_location }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if my_issue %}
+      <div class="alert alert-warning">
+        <h6 class="mb-1"><i class="bi bi-bookmark-check"></i> You have this book</h6>
+        <p class="mb-0 small">Due: <strong>{{ my_issue.due_date|date:"M d, Y" }}</strong></p>
+      </div>
+    {% endif %}
+
+    {% if user.is_tu_admin or user.is_college_admin or user.is_staff %}
+      {% if book.is_available %}
+        <a href="{% url 'issue_book' book.id %}" class="btn btn-primary w-100">
+          <i class="bi bi-bookmark-plus"></i> Issue this book
+        </a>
+      {% else %}
+        <button class="btn btn-secondary w-100" disabled>No copies available</button>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
